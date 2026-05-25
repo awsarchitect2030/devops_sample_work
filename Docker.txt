@@ -1,0 +1,183 @@
+
+
+			                                       Docker  
+
+Problem statements & Solutions: 
++++++++++++++++++++++++++++++++
+
+Tasks To Be Performed:
+1. Pull Ubuntu container
+2. Run this container and map port 80 on the local
+3. Install Apache2 on this container
+4. Check if you are able to access the Apache page on your browser
+
+==========================================================================
+
+1. Create an ubuntu instance on AWS console.
+
+2. Connect to the instance and run "sudo apt update"
+
+3. Run "sudo apt install docker.io -y"
+
+4. To pull any image from Docker hub
+sudo docker pull ubuntu
+
+5. To check if images is downloaded
+sudo docker images
+
+sudo docker --version
+
+6. To create a container (interactive terminal access and background) , run the image.
+sudo docker run -itd -p 80:80 ubuntu 
+
+7. To check running containers : sudo docker ps  (sudo docker ps -a will return stopped container as well)
+
+8. To login to ubuntu container 
+sudo docker exec -it 1cfb5376b49a /bin/bash
+
+9. Once logged in, run "apt update"
+
+10. To install apache2 inside the container, run "apt install apace2 -y"
+To check status : service apache2 status
+To start apache2 : service apache2 status
+
+root@1cfb5376b49a:/# service apache2 status
+ * apache2 is not running
+root@1cfb5376b49a:/# service apache2 start
+ * Starting Apache httpd web server apache2                                                                                                 AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 172.17.0.2. Set the 'ServerName' directive globally to suppress this message
+ * 
+root@1cfb5376b49a:/# service apache2 status
+ * apache2 is running
+root@1cfb5376b49a:/# 
+
+Next allow http traffic on inbound security group manually on the instance so we can validate the traffic from browser.
+
+Once done copy the public IP and test http://public IP:80 and it should display Apache2 home page.
+
+Yay !!
+
+===================================================================
+Tasks To Be Performed:
+1. Save the image created in assignment 1 as a Docker image
+2. Launch container from this new image and map the port to 81
+3. Go inside the container and start the Apache2 service
+4. Check if you are able to access it on the browser
+===================================================================
+
+Now lets create an image from above container.
+
+ubuntu@ip-172-31-16-158:~$ sudo docker ps
+CONTAINER ID   IMAGE     COMMAND       CREATED          STATUS          PORTS                                 NAMES
+1cfb5376b49a   ubuntu    "/bin/bash"   16 minutes ago   Up 16 minutes   0.0.0.0:80->80/tcp, [::]:80->80/tcp   trusting_albattani
+
+Run sudo docker commit 1cfb5376b49a ubuntu_image1
+
+ubuntu@ip-172-31-16-158:~$ sudo docker images
+                                                                                                                        i Info →   U  In Use
+IMAGE                  ID             DISK USAGE   CONTENT SIZE   EXTRA
+ubuntu:latest          f3d28607ddd7        160MB         45.3MB    U   
+ubuntu_image1:latest   68bccad7678c        334MB           92MB   
+
+sudo docker run -itd -p 81:80 --name ubuntu_cont ubuntu_image1:latest
+
+ubuntu@ip-172-31-16-158:~$ sudo docker ps
+CONTAINER ID   IMAGE                  COMMAND       CREATED          STATUS          PORTS                                 NAMES
+01d1be1c8ec7   ubuntu_image1:latest   "/bin/bash"   13 seconds ago   Up 12 seconds   0.0.0.0:81->80/tcp, [::]:81->80/tcp   ubuntu_cont
+1cfb5376b49a   ubuntu                 "/bin/bash"   26 minutes ago   Up 26 minutes   0.0.0.0:80->80/tcp, [::]:80->80/tcp   trusting_albattani
+
+sudo docker exec -it ubuntu_cont /bin/bash
+
+We are not installing apache2 again since it was already installed as part of previous container that we committed into new image.
+
+service apache2 status
+
+service apache2 start
+
+If you need to launch the instance on public IP now, we need to add port 81 for Custom TCP security group for the page to work.
+
+Once its added, try lauching the page as http://public_ip:81 (local machine IP for docker windows)
+
+
+===================================================================
+1. Use the saved image in the previous assignment
+2. Upload this image on Docker Hub
+3. On a separate machine pull this Docker Hub image and launch it on port
+80
+4. Start the Apache2 service
+5. Verify if you are able to see the Apache2 service
+===================================================================
+Tag --> login -->upload
+
+Saving the latest container:
+sudo docker commit 1cfb5376b49a ubuntu_image1
+
+sudo docker tag ubuntu_image1 awsarchitect2030/ubuntu_image1:v1
+
+sudo docker login or sudo docker login -u username and provide the PAT token from docker hub as password
+
+sudo docker push awsarchitect2030/ubuntu_image1:v1
+
+Now launch new instance on AWS console with HTTP port 80 enabled on security settings. Old key can be used.
+
+Launch and run below commands 
+
+sudo apt update
+sudo apt install docker.io -y
+sudo docker images
+sudo docker pull awsarchitect2030/ubuntu_image1:v1
+docker images
+sudo docker run -itd -p 80:80 --name c1 awsarchitect2030/ubuntu_image1:v1
+sudo docker images
+sudo docker ps
+sudo docker run -it 72e66309edd6 /bin/bash
+sudo docker exec -it 72e66309edd6 /bin/bash
+history
+
+Now copy the public ip of new instance and launch browser to verify on port 80.
+
+===================================================================
+1. Create a Dockerfile with the following specs:
+● Ubuntu container
+● Apache2 installed
+● Apache2 should automatically run once the container starts
+
+===================================================================
+
+Dockerfile
+
+FROM ubuntu
+RUN apt-get update && apt-get install -y apache2
+ENTRYPOINT ["apachectl", "-D", "FOREGROUND"]
+
+sudo docker build -t apache_image . 
+docker images
+docker ps
+sudo docker run -itd -p 82:80 apache_image:latest
+sudo docker ps
+docker images
+sudo docker exec -it eager_yalow bash and verify is apache2 is already in running state 
+
+Update port 82 on security group and apache Page should get displayed with http://public IP:82
+
+===================================================================
+1. Create a sample HTML file
+2. Use the Dockerfile from the previous task
+3. Replace this sample HTML file inside the Docker container with the default
+page
+===================================================================
+
+Create index.html with html code
+
+ubuntu@ip-172-31-16-158:~$ cat Dockerfile 
+FROM ubuntu
+RUN apt-get update && apt-get install -y apache2
+ADD . /var/www/html
+CMD ["apachectl", "-D", "FOREGROUND"]
+ubuntu@ip-172-31-16-158:~$ 
+
+sudo docker build -t apache_html .
+sudo docker images
+sudo docker run -itd --name c2 -p 83:80 apache_html:latest
+
+Update port 83 on security group and apache Page should get displayed with http://public IP:83
+

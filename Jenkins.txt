@@ -179,10 +179,7 @@ vi /home/ec2-user/.ssh/authorized_keys
 sudo yum install java-21-amazon-corretto -y
 java -version
 
-Below steps are to set path on Jenkins pipeline to run the job.
-mkdir -p /home/ec2-user/Jenkins
-chmod 755 /home/ec2-user/Jenkins
-
+sudo yum install docker
 ec2-user need to have permission to access the Docker socket so execute below.
 
 sudo usermod -aG docker ec2-user
@@ -193,6 +190,10 @@ docker images
 sudo yum install git -y
 groups ec2-user
 id
+
+Below steps are to set path on Jenkins pipeline to run the job.
+mkdir -p /home/ec2-user/Jenkins
+chmod 755 /home/ec2-user/Jenkins
 
 ===============================================================
 

@@ -1,1 +1,1 @@
-File in this folder contains execution steps 
+File in this folder contains usecase and the execution steps 

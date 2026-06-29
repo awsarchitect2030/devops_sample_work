@@ -58,7 +58,7 @@ Yay !!
 
 ===================================================================
 Tasks To Be Performed:
-1. Save the image created in assignment 1 as a Docker image
+1. Save the image created in requirement 1 as a Docker image
 2. Launch container from this new image and map the port to 81
 3. Go inside the container and start the Apache2 service
 4. Check if you are able to access it on the browser
@@ -99,7 +99,7 @@ Once its added, try lauching the page as http://public_ip:81 (local machine IP f
 
 
 ===================================================================
-1. Use the saved image in the previous assignment
+1. Use the saved image in the previous requirement
 2. Upload this image on Docker Hub
 3. On a separate machine pull this Docker Hub image and launch it on port
 80
